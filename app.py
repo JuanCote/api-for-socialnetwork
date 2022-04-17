@@ -21,7 +21,10 @@ class Users(Resource):
         result = {
             'items': []
         }
-        for i in range(start_user, page * count):
+        last_man = page*count
+        if last_man > int(content['totalCount']):
+            last_man = content['totalCount']
+        for i in range(start_user, int(last_man)):
             result['items'].append(content['items'][i])
         result["totalCount"] = content['totalCount']
         result['error'] = content['error']

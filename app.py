@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
+from flask_cors import CORS
 import json
 
 app = Flask(__name__)
 api = Api()
+CORS(app)
 
 class Main(Resource):
     def get(self):

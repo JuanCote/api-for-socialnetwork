@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
 import json
 
@@ -21,7 +21,9 @@ class Users(Resource):
         }
         for i in range(start_user, page * count):
             result['items'].append(content['items'][i])
-        return result
+        result["totalCount"] = content['totalCount']
+        result['error'] = content['error']
+        return jsonify(result)
     
 api.add_resource(Main, '/api/main')
 api.add_resource(Users, '/api/users')

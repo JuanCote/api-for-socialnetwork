@@ -1,0 +1,43 @@
+h1 {
+    font-weight: 500;
+    margin-top: 50px;
+    font-size: 36px;
+    margin-bottom: 0;
+}
+.container {
+    width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.link {
+    margin-top: 5px;
+    font-size: 20px;
+}
+.box {
+    box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+    border-radius: 4px;
+    border: 1px solid rgb(182, 182, 182);
+    width: 600px;
+    margin-bottom: 40px;
+}
+.box-header {
+    padding: 5px 10px 5px 10px;
+    background: #f5f5f5;
+    border-bottom: 1px solid rgb(182, 182, 182);
+}
+.box-content {
+    padding: 5px 10px 5px 10px;
+    font-size: 18px;
+    display: flex;
+}
+.header-name {
+    font-size: 22px;
+}
+.button-get {
+    position: absolute;
+    margin-left: 470px;
+    width: 70px;
+    background: #63a8e2;
+    color: white;
+    text-align: center;
+}

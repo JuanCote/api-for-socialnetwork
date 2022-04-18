@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Главная страница</title>
+  </head>
+  <body>
+    <div class='container'>
+        <h1>Apidodiku documentation</h1>
+        <p class='link'>https://apidodiku.herokuapp.com/api</p>
+        <div class='box'>
+            <div class='box-header'><span class='header-name'>/test</span></div>
+            <div class='box-content'>
+                /test
+                <div class='button-get'>GET</div>
+            </div>
+        </div>
+        <div class='box'>
+            <div class='box-header'><span class='header-name'>/users</span></div>
+            <div class='box-content'>
+                /users?page={your page}&count={your count of users}
+                <div class='button-get'>GET</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

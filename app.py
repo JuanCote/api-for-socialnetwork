@@ -47,7 +47,8 @@ class Profile(Resource):
         id = request.args.get('id')
         if id:
             profile = models.User.query.filter_by(id=id).first()
-            print(profile.name)
+            if profile is None:
+                return jsonify({'message': 'invalid id'})
             result = {
                 'id': 1,
                 'name': profile.name,
@@ -77,4 +78,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

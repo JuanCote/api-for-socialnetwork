@@ -3,10 +3,18 @@ from flask import Flask, jsonify, request, render_template, url_for
 from flask_restful import Api, Resource
 from flask_cors import CORS
 import json
+from config import Config
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
+app.config.from_object(Config)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 api = Api()
 CORS(app)
+
+import models
 
 class Test(Resource):
     def get(self):
@@ -34,9 +42,32 @@ class Users(Resource):
             result['error'] = content['error']
             return jsonify(result)
         return jsonify({'message': 'variables count and page required'})
+class Profile(Resource):
+    def get(self):
+        id = request.args.get('id')
+        profile = models.User.query.filter_by(id=id).first()
+        print(profile.name)
+        result = {
+            'id': 1,
+            'name': profile.name,
+            'surname': profile.surname,
+            'status': profile.status,
+            'description': profile.description,
+            'job_status': profile.job_status,
+            'job_descritpion': profile.job_description,
+            'site': profile.site,
+            'phone_number': profile.phone_number,
+            'email_contact': profile.email_contact,
+            'telegram': profile.telegram,
+            'whatsapp': profile.whatsapp,
+            'discord': profile.discord,
+            'personal': profile.personal
+        }
+        return jsonify(result)
     
 api.add_resource(Test, '/api/test')
 api.add_resource(Users, '/api/users')
+api.add_resource(Profile, '/api/profile')
 api.init_app(app)
 
 @app.route('/')

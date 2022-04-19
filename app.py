@@ -43,8 +43,7 @@ class Users(Resource):
             return jsonify(result)
         return jsonify({'message': 'variables count and page required'})
 class Profile(Resource):
-    def get(self):
-        id = request.args.get('id')
+    def get(self, id):
         if id:
             profile = models.User.query.filter_by(id=id).first()
             if profile is None:
@@ -70,7 +69,7 @@ class Profile(Resource):
     
 api.add_resource(Test, '/api/test')
 api.add_resource(Users, '/api/users')
-api.add_resource(Profile, '/api/profile')
+api.add_resource(Profile, '/api/profile/<int:id>')
 api.init_app(app)
 
 @app.route('/')

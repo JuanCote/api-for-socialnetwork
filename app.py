@@ -45,25 +45,27 @@ class Users(Resource):
 class Profile(Resource):
     def get(self):
         id = request.args.get('id')
-        profile = models.User.query.filter_by(id=id).first()
-        print(profile.name)
-        result = {
-            'id': 1,
-            'name': profile.name,
-            'surname': profile.surname,
-            'status': profile.status,
-            'description': profile.description,
-            'job_status': profile.job_status,
-            'job_descritpion': profile.job_description,
-            'site': profile.site,
-            'phone_number': profile.phone_number,
-            'email_contact': profile.email_contact,
-            'telegram': profile.telegram,
-            'whatsapp': profile.whatsapp,
-            'discord': profile.discord,
-            'personal': profile.personal
-        }
-        return jsonify(result)
+        if id:
+            profile = models.User.query.filter_by(id=id).first()
+            print(profile.name)
+            result = {
+                'id': 1,
+                'name': profile.name,
+                'surname': profile.surname,
+                'status': profile.status,
+                'description': profile.description,
+                'job_status': profile.job_status,
+                'job_descritpion': profile.job_description,
+                'site': profile.site,
+                'phone_number': profile.phone_number,
+                'email_contact': profile.email_contact,
+                'telegram': profile.telegram,
+                'whatsapp': profile.whatsapp,
+                'discord': profile.discord,
+                'personal': profile.personal
+            }
+            return jsonify(result)
+        return jsonify({'message': 'variables id reqired'})
     
 api.add_resource(Test, '/api/test')
 api.add_resource(Users, '/api/users')

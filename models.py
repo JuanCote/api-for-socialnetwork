@@ -4,8 +4,13 @@ from app import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    
+    email = db.Column(db.String, unique=True)
+    password_hash = db.Column(db.String)
+    username = db.Column(db.String(50), unique=True)
     name = db.Column(db.String(50))
     surname = db.Column(db.String(50))
+    avatar = db.Column(db.BLOB)
     status = db.Column(db.Text(500))
     description = db.Column(db.Text(500))
     job_status = db.Column(db.Boolean)

@@ -1,16 +1,29 @@
 
+from ast import parse
 from flask import Flask, jsonify, request, render_template, url_for
-from flask_restful import Api, Resource
+from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 import json
+from sqlalchemy import MetaData
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash, check_password_hash
+
+metadata = MetaData(
+    naming_convention={
+    "ix": 'ix_%(column_0_label)s',
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+    }
+)
 
 app = Flask(__name__)
 app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db = SQLAlchemy(app, metadata=metadata)
+migrate = Migrate(app, db, render_as_batch=True)
 api = Api()
 CORS(app)
 
@@ -27,21 +40,23 @@ class Users(Resource):
         if page and count:
             count = int(count)
             page = int(page)
-            with open('users.json') as f:
-                content = json.loads(f.read())
             start_user = (page - 1) * count
-            result = {
-                'items': []
-            }
             last_man = page*count
-            if last_man > int(content['totalCount']):
-                last_man = content['totalCount']
-            for i in range(start_user, int(last_man)):
-                result['items'].append(content['items'][i])
-            result["totalCount"] = content['totalCount']
-            result['error'] = content['error']
+            total_count = models.User.query.count()
+            users = models.User.query.all()
+            result = {
+                'items': [],
+                'totalCount': total_count
+            }
+            for user in users:
+                result['items'].append({
+                    'name': user.name,
+                    'photo': '',
+                    'status': user.status
+                })
             return jsonify(result)
         return jsonify({'message': 'variables count and page required'})
+
 class Profile(Resource):
     def get(self, id):
         if id:
@@ -56,20 +71,52 @@ class Profile(Resource):
                 'description': profile.description,
                 'job_status': profile.job_status,
                 'job_descritpion': profile.job_description,
-                'site': profile.site,
-                'phone_number': profile.phone_number,
-                'email_contact': profile.email_contact,
-                'telegram': profile.telegram,
-                'whatsapp': profile.whatsapp,
-                'discord': profile.discord,
-                'personal': profile.personal
+                'contacts': {
+                    'site': profile.site,
+                    'phone_number': profile.phone_number,
+                    'email_contact': profile.email_contact,
+                    'telegram': profile.telegram,
+                    'whatsapp': profile.whatsapp,
+                    'discord': profile.discord,
+                    'personal': profile.personal
+                }
             }
             return jsonify(result)
         return jsonify({'message': 'variables id reqired'})
+
+class Register(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('email', type=str)
+        parser.add_argument('password', type=str)
+        data = parser.parse_args()
+        if data['username'] == None or data['email'] == None or data['password'] == None:
+            return {'message': 'invalid request'}
+        if models.User.query.filter_by(username=data['username']).first():
+            return {'message': 'username already taken'}
+        if models.User.query.filter_by(email=data['email']).first():
+            return {'message': 'email already taken'}
+        hash = generate_password_hash(data['password'])
+        u = models.User(email=data['email'], username=data['username'], password_hash=hash)
+        db.session.add(u)
+        db.session.commit()
+        return {'message': 'new user created'}
     
+class Login(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('password', type=str)
+        data = parser.parse_args()
+        if data['username'] == None or data['password'] == None:
+            return {'message': 'invalid request'}
+        
+        
 api.add_resource(Test, '/api/test')
 api.add_resource(Users, '/api/users')
 api.add_resource(Profile, '/api/profile/<int:id>')
+api.add_resource(Register, '/api/register')
 api.init_app(app)
 
 @app.route('/')

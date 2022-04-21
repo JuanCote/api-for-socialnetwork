@@ -4,11 +4,12 @@ from flask import Flask, jsonify, request, render_template, url_for
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 import json
-from sqlalchemy import MetaData
+from sqlalchemy import Identity, MetaData
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 
 metadata = MetaData(
     naming_convention={
@@ -21,6 +22,7 @@ metadata = MetaData(
 )
 
 app = Flask(__name__)
+jwt = JWTManager(app)
 app.config.from_object(Config)
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db, render_as_batch=True)
@@ -30,10 +32,12 @@ CORS(app)
 import models
 
 class Test(Resource):
+    @jwt_required()
     def get(self):
         return {'girl': 'Andrey'}
     
 class Users(Resource):
+    @jwt_required()
     def get(self):
         page = request.args.get('page')
         count = request.args.get('count')
@@ -104,19 +108,43 @@ class Register(Resource):
         return {'message': 'new user created'}
     
 class Login(Resource):
-    def get(self):
+    def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
         data = parser.parse_args()
         if data['username'] == None or data['password'] == None:
             return {'message': 'invalid request'}
-        
+        password = data['password']
+        if '@' in data['username']:
+            user = models.User.query.filter_by(email=data['username']).first()
+        else:
+            user = models.User.query.filter_by(username=data['username']).first()
+        if user == None:
+            return {'message': 'user not found'}
+        if check_password_hash(user.password_hash, password):
+            access = create_access_token(identity=user.id)
+            refresh = create_refresh_token(identity=user.id)
+            return {
+                'access': access,
+                'refresh': refresh
+            }
+
+class Refresh(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        identity = get_jwt_identity()
+        access = create_access_token(identity=identity)
+        return {
+            'access': access
+        }
         
 api.add_resource(Test, '/api/test')
 api.add_resource(Users, '/api/users')
 api.add_resource(Profile, '/api/profile/<int:id>')
 api.add_resource(Register, '/api/register')
+api.add_resource(Login, '/api/login')
+api.add_resource(Refresh, '/api/refresh')
 api.init_app(app)
 
 @app.route('/')

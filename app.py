@@ -94,8 +94,10 @@ class Register(Resource):
         parser.add_argument('username', type=str)
         parser.add_argument('email', type=str)
         parser.add_argument('password', type=str)
+        parser.add_argument('name', type=str)
+        parser.add_argument('surname', type=str)
         data = parser.parse_args()
-        if data['username'] == None or data['email'] == None or data['password'] == None:
+        if data['username'] == None or data['email'] == None or data['password'] == None or data['name'] == None or data['surname'] == None:
             return {'resultCode': 1,
                     'message': 'invalid request'}
         if models.User.query.filter_by(username=data['username']).first():
@@ -105,7 +107,7 @@ class Register(Resource):
             return {'resultCode': 1,
                     'message': 'email already taken'}
         hash = generate_password_hash(data['password'])
-        u = models.User(email=data['email'], username=data['username'], password_hash=hash)
+        u = models.User(email=data['email'], username=data['username'], password_hash=hash, name=data['name'], surname=data['surname'])
         db.session.add(u)
         db.session.commit()
         return {'resultCode': 0,

@@ -9,7 +9,7 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 
 metadata = MetaData(
     naming_convention={
@@ -96,16 +96,20 @@ class Register(Resource):
         parser.add_argument('password', type=str)
         data = parser.parse_args()
         if data['username'] == None or data['email'] == None or data['password'] == None:
-            return {'message': 'invalid request'}
+            return {'resultCode': 1,
+                    'message': 'invalid request'}
         if models.User.query.filter_by(username=data['username']).first():
-            return {'message': 'username already taken'}
+            return {'resultCode': 1,
+                    'message': 'username already taken'}
         if models.User.query.filter_by(email=data['email']).first():
-            return {'message': 'email already taken'}
+            return {'resultCode': 1,
+                    'message': 'email already taken'}
         hash = generate_password_hash(data['password'])
         u = models.User(email=data['email'], username=data['username'], password_hash=hash)
         db.session.add(u)
         db.session.commit()
-        return {'message': 'new user created'}
+        return {'resultCode': 0,
+                'message': 'new user created'}
     
 class Login(Resource):
     def post(self):
@@ -121,23 +125,25 @@ class Login(Resource):
         else:
             user = models.User.query.filter_by(username=data['username']).first()
         if user == None:
-            return {'message': 'user not found'}
+            return {'message': 'user not found'}, 401
         if check_password_hash(user.password_hash, password):
             access = create_access_token(identity=user.id)
             refresh = create_refresh_token(identity=user.id)
-            return {
-                'access': access,
-                'refresh': refresh
-            }
+            resp = jsonify({'login': True})
+            set_access_cookies(resp, access)
+            set_refresh_cookies(resp, refresh)
+            return resp
+        else:
+            return {'messsage': 'invalid password'}, 401
 
 class Refresh(Resource):
     @jwt_required(refresh=True)
     def post(self):
         identity = get_jwt_identity()
         access = create_access_token(identity=identity)
-        return {
-            'access': access
-        }
+        resp = jsonify({'refresh': True})
+        set_access_cookies(resp, access)
+        return resp, 200
         
 api.add_resource(Test, '/api/test')
 api.add_resource(Users, '/api/users')
@@ -153,3 +159,4 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    

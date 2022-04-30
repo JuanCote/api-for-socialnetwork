@@ -7,3 +7,4 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_AS_ASCII = False
+    JWT_SECRET_KEY = 'y&mVNO)ZMe01Wtv'

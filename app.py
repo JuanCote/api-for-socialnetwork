@@ -1,8 +1,9 @@
 
 from ast import parse
+from audioop import cross
 from flask import Flask, jsonify, request, render_template, url_for
 from flask_restful import Api, Resource, reqparse
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import json
 from sqlalchemy import Identity, MetaData
 from config import Config
@@ -27,7 +28,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db, render_as_batch=True)
 api = Api()
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 import models
 

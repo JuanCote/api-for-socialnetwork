@@ -27,12 +27,11 @@ app.config.from_object(Config)
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db, render_as_batch=True)
 api = Api()
-CORS(app)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 import models
 
 class Test(Resource):
-    @jwt_required()
     def get(self):
         return {'girl': 'Andrey'}
     

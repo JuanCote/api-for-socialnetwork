@@ -43,6 +43,20 @@
                 <div class='button-post'>POST</div>
             </div>
         </div>
+        <div class='box'>
+            <div class='box-header'><span class='header-name'>/login</span></div>
+            <div class='box-content'>
+                <a class='a-link' href='#' data-bs-toggle="modal" data-bs-target="#staticBackdrop4">/login</a>
+                <div class='button-post'>POST</div>
+            </div>
+        </div>
+        <div class='box'>
+            <div class='box-header'><span class='header-name'>/auth</span></div>
+            <div class='box-content'>
+                <a class='a-link' href='#' data-bs-toggle="modal" data-bs-target="#staticBackdrop5">/auth</a>
+                <div class='button-get'>GET</div>
+            </div>
+        </div>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -164,8 +178,6 @@
                     <!-- Tabs navs -->
 
                     <!-- Tabs content -->
-
-
                 </div>
                 <div class="modal-body">
                     <div class="tab-content" id="myTabContent">
@@ -201,6 +213,7 @@
     "resultCode": "1",
     "message": "username already taken"
 }
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -208,10 +221,96 @@
                 </div>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-            crossorigin="anonymous"></script>
     </div>
+    <div class="modal fade" id="staticBackdrop4" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home1"
+                                type="button" role="tab" aria-controls="home" aria-selected="true">Request</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile1"
+                                type="button" role="tab" aria-controls="profile" aria-selected="false">Response</button>
+                        </li>
+                    </ul>
+                    <!-- Tabs navs -->
+
+                    <!-- Tabs content -->
+                </div>
+                <div class="modal-body">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home1" role="tabpanel" aria-labelledby="home-tab">
+                            <b>Properties</b>
+                            <ul>
+                                <li> <b>username</b> (string) email or username 
+                                <li> <b>password</b> (string)
+                            </ul>
+                            <b>Example</b>
+                            <pre>
+{
+    "username": "akshan_shit",
+    "password": "123456"
+}
+                            </pre>
+                        </div>
+                        <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab">
+                            <b>Properties</b>
+                            <ul>
+                                <li> <b>resultCode</b> (0 if opearation completed successfullt, other numbers - some error occured) 
+                                <li> <b>message</b> contains error messages if resultCode is different from 0
+                            </ul>
+                            <b>Example</b>
+                            <pre>
+{
+    "resultCode": "1",
+    "message": "invalid password"
+}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="staticBackdrop5" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel1">Response</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <b>Properties</b>
+                            <ul>
+                                <li> <b>email</b> (string) 
+                                <li> <b>username</b> (string)
+                                <li> <b>id</b> (int) 
+                            </ul>
+                            <b>Example</b>
+                            <pre>
+{
+    "email": "lyy1707@gmail.com",
+    "username": "NikitaVeter",
+    "id": 2
+}
+                            </pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
 </body>
 
 </html>

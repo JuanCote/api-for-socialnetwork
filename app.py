@@ -1,6 +1,7 @@
 
 from ast import parse
 from audioop import cross
+from os import access
 from flask import Flask, jsonify, request, render_template, url_for
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS, cross_origin
@@ -37,7 +38,6 @@ class Test(Resource):
         return {'girl': 'Andrey'}
     
 class Users(Resource):
-    @jwt_required()
     def get(self):
         page = request.args.get('page')
         count = request.args.get('count')
@@ -120,14 +120,16 @@ class Login(Resource):
         parser.add_argument('password', type=str)
         data = parser.parse_args()
         if data['username'] == None or data['password'] == None:
-            return {'message': 'invalid request'}
+            return {'message': 'invalid request',
+                    'resultCode': 1}
         password = data['password']
         if '@' in data['username']:
             user = models.User.query.filter_by(email=data['username']).first()
         else:
             user = models.User.query.filter_by(username=data['username']).first()
         if user == None:
-            return {'message': 'user not found'}, 401
+            return {'message': 'user not found',
+                    'resultCode': 1}
         if check_password_hash(user.password_hash, password):
             access = create_access_token(identity=user.id)
             refresh = create_refresh_token(identity=user.id)
@@ -136,16 +138,26 @@ class Login(Resource):
             set_refresh_cookies(resp, refresh)
             return resp
         else:
-            return {'messsage': 'invalid password'}, 401
+            return {'messsage': 'invalid password',
+                    'resultCode': 1}
 
 class Refresh(Resource):
     @jwt_required(refresh=True)
-    def post(self):
+    def get(self):
         identity = get_jwt_identity()
         access = create_access_token(identity=identity)
-        resp = jsonify({'refresh': True})
+        resp = {'refresh': True}
         set_access_cookies(resp, access)
         return resp, 200
+
+class Auth(Resource):
+    @jwt_required()
+    def get(self):
+        identity = get_jwt_identity()
+        user = models.User.query.filter_by(id=identity).first()
+        return {'email': user.email,
+                'username': user.username,
+                'id': user.id}
         
 api.add_resource(Test, '/api/test')
 api.add_resource(Users, '/api/users')
@@ -153,6 +165,7 @@ api.add_resource(Profile, '/api/profile/<int:id>')
 api.add_resource(Register, '/api/register')
 api.add_resource(Login, '/api/login')
 api.add_resource(Refresh, '/api/refresh')
+api.add_resource(Auth, '/api/auth')
 api.init_app(app)
 
 @app.route('/')

@@ -7,6 +7,13 @@ from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS, cross_origin
 import json
 from requests import Response
+from flask import Flask, jsonify, request, render_template, url_for
+from flask_restful import Api, Resource
+from flask_cors import CORS
+import json
+from config import Config
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from sqlalchemy import Identity, MetaData
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
@@ -27,8 +34,8 @@ metadata = MetaData(
 app = Flask(__name__)
 jwt = JWTManager(app)
 app.config.from_object(Config)
-db = SQLAlchemy(app, metadata=metadata)
-migrate = Migrate(app, db, render_as_batch=True)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 api = Api()
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
@@ -45,23 +52,21 @@ class Users(Resource):
         if page and count:
             count = int(count)
             page = int(page)
+            with open('users.json') as f:
+                content = json.loads(f.read())
             start_user = (page - 1) * count
-            last_man = page*count
-            total_count = models.User.query.count()
-            users = models.User.query.all()
             result = {
-                'items': [],
-                'totalCount': total_count
+                'items': []
             }
-            for user in users:
-                result['items'].append({
-                    'name': user.name,
-                    'photo': '',
-                    'status': user.status
-                })
+            last_man = page*count
+            if last_man > int(content['totalCount']):
+                last_man = content['totalCount']
+            for i in range(start_user, int(last_man)):
+                result['items'].append(content['items'][i])
+            result["totalCount"] = content['totalCount']
+            result['error'] = content['error']
             return jsonify(result)
         return jsonify({'message': 'variables count and page required'})
-
 class Profile(Resource):
     def get(self, id):
         if id:
@@ -76,15 +81,13 @@ class Profile(Resource):
                 'description': profile.description,
                 'job_status': profile.job_status,
                 'job_descritpion': profile.job_description,
-                'contacts': {
-                    'site': profile.site,
-                    'phone_number': profile.phone_number,
-                    'email_contact': profile.email_contact,
-                    'telegram': profile.telegram,
-                    'whatsapp': profile.whatsapp,
-                    'discord': profile.discord,
-                    'personal': profile.personal
-                }
+                'site': profile.site,
+                'phone_number': profile.phone_number,
+                'email_contact': profile.email_contact,
+                'telegram': profile.telegram,
+                'whatsapp': profile.whatsapp,
+                'discord': profile.discord,
+                'personal': profile.personal
             }
             return jsonify(result)
         return jsonify({'message': 'variables id reqired'})
@@ -113,7 +116,7 @@ class Register(Resource):
         db.session.commit()
         return {'resultCode': 0,
                 'message': 'new user created'}
-    
+
 class Login(Resource):
     def post(self):
         parser = reqparse.RequestParser()

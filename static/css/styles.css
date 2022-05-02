@@ -42,12 +42,12 @@ h1 {
     text-align: center;
 }
 .button-post {
-    background: #6cbd7d;
-    color: white;
-    text-align: center;
     position: absolute;
     margin-left: 470px;
     width: 70px;
+    background: #6cbd7d;
+    color: white;
+    text-align: center;
 }
 .a-link {
     text-decoration: none;

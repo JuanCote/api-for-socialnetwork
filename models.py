@@ -4,13 +4,8 @@ from app import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    
-    email = db.Column(db.String, unique=True)
-    password_hash = db.Column(db.String)
-    username = db.Column(db.String(50), unique=True)
     name = db.Column(db.String(50))
     surname = db.Column(db.String(50))
-    avatar = db.Column(db.BLOB)
     status = db.Column(db.Text(500))
     description = db.Column(db.Text(500))
     job_status = db.Column(db.Boolean)
@@ -22,6 +17,9 @@ class User(db.Model):
     whatsapp = db.Column(db.String)
     discord = db.Column(db.String)
     personal = db.Column(db.String)
+    username = db.Column(db.String)
+    password_hash = db.Column(db.String)
+    email = db.Column(db.String)
     
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)

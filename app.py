@@ -6,6 +6,7 @@ from flask import Flask, jsonify, request, render_template, url_for
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS, cross_origin
 import json
+from requests import Response
 from sqlalchemy import Identity, MetaData
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
@@ -146,9 +147,9 @@ class Refresh(Resource):
     def get(self):
         identity = get_jwt_identity()
         access = create_access_token(identity=identity)
-        resp = {'refresh': True}
+        resp = jsonify({'refresh': True})
         set_access_cookies(resp, access)
-        return resp, 200
+        return resp
 
 class Auth(Resource):
     @jwt_required()

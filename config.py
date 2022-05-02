@@ -8,6 +8,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_AS_ASCII = False
     JWT_SECRET_KEY = 'y&mVNO)ZMe01Wtv'
+    JWT_COOKIE_SECURE = True
     JWT_TOKEN_LOCATION = ['cookies']
     #JWT_ACCESS_COOKIE_PATH = '/api/'
     #JWT_REFRESH_COOKIE_PATH = '/api/refresh'
